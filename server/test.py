@@ -12,3 +12,7 @@ datahandler.add_ticket(ticket)
 print(datahandler.get_tickets())
 print(str(datahandler.get_tickets()[0]))
 print(datahandler.count_tickets())
+ticket = datahandler.get_tickets()[0]
+ticket.status = "closed"
+datahandler.update_ticket(ticket)
+print(datahandler.get_tickets()[0])

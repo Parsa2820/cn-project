@@ -51,6 +51,16 @@ class DataHandler:
         with open(os.path.join(self.data_directory, self.ACCOUNTS_FILE), "w") as f:
             json.dump(accounts, f, default=lambda o: o.__dict__, indent=4)
 
+    def __remove_account(self, username: str):
+        accounts = self.get_accounts()
+        accounts = [account for account in accounts if account.username != username]
+        with open(os.path.join(self.data_directory, self.ACCOUNTS_FILE), "w") as f:
+            json.dump(accounts, f, default=lambda o: o.__dict__, indent=4)
+
+    def update_account(self, account: Account) -> None:
+        self.__remove_account(account.username)
+        self.add_account(account)
+
     def get_videos(self) -> List[Video]:
         with open(os.path.join(self.data_directory, self.VIDEOS_FILE), "r") as f:
             pass
@@ -68,3 +78,13 @@ class DataHandler:
         tickets.append(ticket)
         with open(os.path.join(self.data_directory, self.TICKET_FILE), "w") as f:
             json.dump(tickets, f, default=lambda o: o.__dict__, indent=4)    
+
+    def __remove_ticket(self, id: int):
+        tickets = self.get_tickets()
+        tickets = [ticket for ticket in tickets if ticket.id != id]
+        with open(os.path.join(self.data_directory, self.TICKET_FILE), "w") as f:
+            json.dump(tickets, f, default=lambda o: o.__dict__, indent=4)
+
+    def update_ticket(self, ticket: Ticket) -> None:
+        self.__remove_ticket(ticket.id)
+        self.add_ticket(ticket)
