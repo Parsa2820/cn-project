@@ -1,6 +1,6 @@
 # TODO SOHEIL
 
-from server.models.video.comment import Comment
+from models.video.comment import Comment
 
 
 class Video():

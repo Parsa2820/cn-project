@@ -11,4 +11,4 @@ class Account:
         return Account(json_data["account_type"], json_data["username"], json_data["password"])
 
     def __str__(self):
-        return "Account: {}, {}".format(self.account_type, self.username)
+        return "{} {}".format(self.account_type, self.username)

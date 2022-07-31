@@ -2,7 +2,7 @@ from typing import List
 import os
 import json
 from models.account.account import Account
-# from models.ticket.ticket import Ticket
+from models.support.ticket import Ticket
 from models.video.video import Video
 
 
@@ -52,6 +52,13 @@ class DataHandler:
         with open(os.path.join(self.data_directory, self.VIDEOS_FILE), "r") as f:
             pass
 
+    def get_tickets(self) -> List[Ticket]:
+        with open(os.path.join(self.data_directory, self.TICKET_FILE), "r") as f:
+            tickets = json.load(f)
+        return [Ticket.from_json(ticket) for ticket in tickets]
 
-
-    
+    def add_ticket(self, ticket: Ticket) -> None:
+        tickets = self.get_tickets()
+        tickets.append(ticket)
+        with open(os.path.join(self.data_directory, self.TICKET_FILE), "w") as f:
+            json.dump(tickets, f, default=lambda o: o.__dict__, indent=4)    
