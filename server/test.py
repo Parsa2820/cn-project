@@ -5,9 +5,10 @@ from models.support.ticket import Ticket, Reply
 
 datahandler = DataHandler("../test_data")
 account = Account("user", "majid", "user")
-ticket = Ticket(account, "message")
+ticket = Ticket(1, account, "message")
 ticket.replies.append(Reply(account, "message"))
 ticket.replies.append(Reply(account, "message"))
 datahandler.add_ticket(ticket)
 print(datahandler.get_tickets())
 print(str(datahandler.get_tickets()[0]))
+print(datahandler.count_tickets())

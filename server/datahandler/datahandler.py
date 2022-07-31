@@ -42,6 +42,9 @@ class DataHandler:
             accounts = json.load(f)
         return [Account.from_json(account) for account in accounts]
 
+    def count_accounts(self) -> int:
+        return len(self.get_accounts())
+
     def add_account(self, account: Account) -> None:
         accounts = self.get_accounts()
         accounts.append(account)
@@ -56,6 +59,9 @@ class DataHandler:
         with open(os.path.join(self.data_directory, self.TICKET_FILE), "r") as f:
             tickets = json.load(f)
         return [Ticket.from_json(ticket) for ticket in tickets]
+
+    def count_tickets(self) -> int:
+        return len(self.get_tickets())
 
     def add_ticket(self, ticket: Ticket) -> None:
         tickets = self.get_tickets()

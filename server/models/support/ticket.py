@@ -23,15 +23,15 @@ class Ticket:
         self.replies: List[Reply] = []
 
     def from_json(json_data: dict):
-        ticket = Ticket(Account.from_json(json_data["id"],
-                                          json_data["account"]), json_data["message"])
+        ticket = Ticket(json_data["id"], Account.from_json(
+            json_data["account"]), json_data["message"])
         ticket.status = json_data["status"]
         ticket.replies = [Reply.from_json(reply)
                           for reply in json_data["replies"]]
         return ticket
 
     def __str__(self):
-        return "Ticket {} from {}: {}".format(id, str(self.account), self.message) \
+        return "Ticket {} from {}: {}".format(self.id, str(self.account), self.message) \
             + "\nStatus: {}".format(self.status) \
             + "\nReplies:\n\t" \
             + "\n\t".join([str(reply) for reply in self.replies])
