@@ -30,6 +30,21 @@ class Ticket:
                           for reply in json_data["replies"]]
         return ticket
 
+    def to_new(self):
+        self.status = "new"
+
+    def to_pending(self):
+        self.status = "pending"
+
+    def to_resolved(self):
+        self.status = "resolved"
+
+    def to_closed(self):
+        self.status = "closed"
+
+    def add_reply(self, reply: Reply):
+        self.replies.append(reply)
+
     def __str__(self):
         return "Ticket {} from {}: {}".format(self.id, str(self.account), self.message) \
             + "\nStatus: {}".format(self.status) \
