@@ -16,17 +16,19 @@ class DataHandler:
         Account("manager", "manager", "123")
     ]
 
-    def __init__(self, data_directory: str) -> None:
+    def __init__(self, data_directory: str, clear: bool=False) -> None:
         self.data_directory: str = data_directory
-        self.__check_data_directory()
+        self.__check_data_directory(clear)
 
-    def __check_data_directory(self) -> None:
+    def __check_data_directory(self, clear: bool) -> None:
         if not os.path.exists(self.data_directory):
             raise Exception("Data directory does not exist")
         if len(os.listdir(self.data_directory)) > 0:
             if not self.__exist_files():
                 raise Exception(
                     "Data directory does not contain this application's data")
+            if clear:
+                self.__init_files()
         else:
             self.__init_files()
 
@@ -54,7 +56,7 @@ class DataHandler:
         for account in accounts:
             if account.username == username:
                 return account
-        return None
+        raise KeyError(f"Account {username} not found")
 
     def count_accounts(self) -> int:
         return len(self.get_accounts())
@@ -122,7 +124,7 @@ class DataHandler:
         for ticket in tickets:
             if ticket.id == ticket_id:
                 return ticket
-        return None
+        raise KeyError(f"Ticket {ticket_id} not found")
 
     def count_tickets(self) -> int:
         return len(self.get_tickets())
