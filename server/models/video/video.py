@@ -6,10 +6,7 @@ from models.video.comment import Comment
 class Video():
     """
     """
-    video_counter: int = 0
-    all_videos = list()
-
-    def __init__(self, title: str, description: str, uploader_username: str):
+    def __init__(self, video_id: int, title: str, description: str, uploader_username: str):
         """
         Constructor of Video:
         is_new: bool variable indicating if the object is being creating or loaded from DB!
@@ -25,57 +22,25 @@ class Video():
         dislikes: list of the dislikers' usernames!
         """
         self.title = title
+        self.video_id = video_id
+        self.video_path = self.__generate_video_path()
         self.description = description
         self.uploader_username = uploader_username
         self.is_available = True
-        self.comment_counter = 0
         self.comments = list()
-        Video.video_counter += 1 #TODO need to read this from database!
-        self.video_id = 0 # TODO need to increment video_counter!
-        self.video_path = "./video_0" # TODO need to generate video_path!
-        self.likes = set() # TODO
-        self.dislikes = set() # TODO
-
-        Video.all_videos.append(self)
+        self.likes = list()
+        self.dislikes = list() 
     
-    @classmethod
-    def generate_video_id(cls) -> str:
-        """
-        class method to generate id for a video according to the number of videos till now!
-        """
-        output = f'{cls.video_counter}'
-        return output
+    def __generate_video_path(self):
+        return f'./{self.title}_{self.video_id}.dat'
 
-    @classmethod
-    def set_video_counter(cls, value: int) -> None:
-        """
-        class method to set the value of static variable video_counter!
-        hint: this method is probably used upon reading the data from database!
-        """
-        cls.video_counter = value
-
-    @classmethod
-    def add_video_from_database(cls, title: str, description: str, uploader_username: str, is_available: bool, 
-    comments: list, video_id: str, video_path: str, likes: list, dislikes: list):
-        """
-        """
-        # TODO
-
-    def add_comment(self, username: str, text: str) -> None:
+    def add_comment(self, comment_id: int, username: str, text: str) -> None:
         """
         adds a comment to comments' list!
         requires username of the commenter and the text!
         """
-        comment = Comment(self.generate_comment_id(), username, text)
-        self.comment_counter += 1
+        comment = Comment(comment_id, username, text)
         self.comments.append(comment)
-
-    def generate_comment_id(self) -> str:
-        """
-        generates a comment id based on the current comment_counter!
-        """
-        output = f'{self.comment_counter}'
-        return output
 
     def has_user_liked(self, username: str) -> bool:
         """
@@ -95,14 +60,14 @@ class Video():
         if already liked nothing happends!
         if disliked before, removed from dislikes set and added to likes set!
         """
-        if self.has_user_liked:
+        if self.has_user_liked(username):
             return
-        elif self.has_user_disliked:
+        elif self.has_user_disliked(username):
             self.dislikes.remove(username)
-            self.likes.add(username)
+            self.likes.append(username)
             return
         else:
-            self.likes.add(username)
+            self.likes.append(username)
     
     def dislike_video(self, username: str) -> None:
         """
@@ -110,14 +75,14 @@ class Video():
         if already disliked nothing happends!
         if liked before, removed from likes set and added to dislikes set!
         """
-        if self.has_user_disliked:
+        if self.has_user_disliked(username):
             return
-        elif self.has_user_liked:
+        elif self.has_user_liked(username):
             self.likes.remove(username)
-            self.dislikes.add(username)
+            self.dislikes.append(username)
             return
         else:
-            self.dislikes.add(username)
+            self.dislikes.append(username)
 
     def unlike_video(self, username: str) -> None:
         """
@@ -135,11 +100,57 @@ class Video():
         """
         returns the list of videos uploaded by a user!
         """
-        videos = list()
-        for video in self.all_videos: # TODO
-            if video.uploader_username == username:
-                videos.append(video)
-        return videos
+        pass
+
+    def ban_video(self) -> None:
+        """
+        Makes the video unavailable!
+        """
+        self.is_available = False
+
+    def unban_video(self) -> None:
+        """
+        Makes the video available!
+        """
+        self.is_available = True
+
+    def count_likes(self) -> int:
+        """
+        returns the number of likes on this video!
+        """
+        return len(self.likes)
+
+    def count_dislikes(self) -> int:
+        """
+        returns the number of dislikes on this video!
+        """
+        return len(self.dislikes)
+
+    def from_json(json: dict):
+        video = Video(json['video_id'],json['title'],json['description']
+                    ,json['uploader_username'])
+        video.is_available = json['is_available']
+        video.comments = [Comment.from_json(comment) for comment in json['comments']]
+        video.video_path = json['video_path']
+        video.likes = json['likes']
+        video.dislikes = json['dislikes']
+        return video
+
+    def __str__(self) -> str:
+        return "id: {} \n" .format(self.video_id) \
+            + "title: {} \n" .format(self.title) \
+            + "description: {} \n" .format(self.description) \
+            + "Likes: {} \n" .format(str(self.count_likes())) \
+            + "DisLikes: {} \n" .format(str(self.count_dislikes())) \
+            + "Comments: \n\t" \
+            + "\n\t" .join([str(comment) for comment in self.comments])
+
+
+
+
+        
+    
+
 
 
 

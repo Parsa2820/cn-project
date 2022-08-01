@@ -63,7 +63,27 @@ class DataHandler:
 
     def get_videos(self) -> List[Video]:
         with open(os.path.join(self.data_directory, self.VIDEOS_FILE), "r") as f:
-            pass
+            videos = json.load(f)
+        return [Video.from_json(video) for video in videos]
+
+    def count_videos(self) -> int:
+        return len(self.get_videos())
+
+    def add_video(self, video: Video) -> None:
+        videos = self.get_videos()
+        videos.append(video)
+        with open(os.path.join(self.data_directory, self.VIDEOS_FILE), "w") as f:
+            json.dump(videos, f, default=lambda o: o.__dict__, indent=4)
+
+    def __remove_video(self, id: int) -> None:
+        videos = self.get_videos()
+        videos = [video for video in videos if video.video_id != id]
+        with open(os.path.join(self.data_directory, self.VIDEOS_FILE), "w") as f:
+            json.dump(videos, f, default=lambda o: o.__dict__, indent=4)
+
+    def update_video(self, video: Video) -> None:
+        self.__remove_video(video.video_id)
+        self.add_video(video)
 
     def get_tickets(self) -> List[Ticket]:
         with open(os.path.join(self.data_directory, self.TICKET_FILE), "r") as f:
