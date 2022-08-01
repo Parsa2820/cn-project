@@ -4,7 +4,7 @@ from models.support.ticket import Ticket, Reply
 from models.video.video import Video
 
 
-datahandler = DataHandler("./test_data")
+datahandler = DataHandler("../test_data")
 account = Account("user", "majid", "user")
 ticket = Ticket(1, account, "message")
 ticket.replies.append(Reply(account, "message"))
