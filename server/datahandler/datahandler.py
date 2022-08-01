@@ -85,6 +85,13 @@ class DataHandler:
         self.__remove_video(video.video_id)
         self.add_video(video)
 
+    def count_comments_of_video(self, video: Video) -> int:
+        videos = self.get_videos()
+        for single_video in videos:
+            if single_video.video_id == video.video_id:
+                return len(single_video.comments)
+        return 0 # this should never happen!
+
     def get_tickets(self) -> List[Ticket]:
         with open(os.path.join(self.data_directory, self.TICKET_FILE), "r") as f:
             tickets = json.load(f)
