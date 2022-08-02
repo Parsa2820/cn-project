@@ -56,12 +56,12 @@ class DataHandler:
             requests = json.load(f)
         return [Request.from_json(request) for request in requests]
 
-    def get_request_by_id(self, request_id: int) -> Request:
+    def get_request_by_id(self, username: int) -> Request:
         requests = self.get_requests()
         for request in requests:
-            if request.request_id == request_id:
+            if request.username == username:
                 return request
-        raise KeyError(f"Request {request_id} not found")
+        raise KeyError(f"Request {username} not found")
 
     def add_request(self, request: Request) -> None:
         requests = self.get_requests()
@@ -72,7 +72,7 @@ class DataHandler:
     def update_request(self, request: Request) -> None:
         requests = self.get_requests()
         requests = [
-            request for request in requests if request.request_id != request.request_id]
+            request for request in requests if request.username != request.username]
         requests.append(request)
         with open(os.path.join(self.data_directory, self.REQUEST_FILE), "w") as f:
             json.dump(requests, f, default=lambda o: o.__dict__, indent=4)

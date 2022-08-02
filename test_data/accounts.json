@@ -1,2 +1,26 @@
 [
+    {
+        "account_type": "public",
+        "username": "_",
+        "password": "_",
+        "is_banned": false
+    },
+    {
+        "account_type": "manager",
+        "username": "manager",
+        "password": "123",
+        "is_banned": false
+    },
+    {
+        "account_type": "admin",
+        "username": "admin",
+        "password": "123",
+        "is_banned": false
+    },
+    {
+        "account_type": "user",
+        "username": "user",
+        "password": "123",
+        "is_banned": false
+    }
 ]
