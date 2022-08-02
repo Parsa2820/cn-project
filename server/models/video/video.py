@@ -27,6 +27,7 @@ class Video():
         self.description = description
         self.uploader_username = uploader_username
         self.is_available = True
+        self.tags = list()
         self.comments = list()
         self.likes = list()
         self.dislikes = list() 
@@ -88,13 +89,15 @@ class Video():
         """
         remove username from liked set!
         """
-        self.likes.remove(username)
+        if username in self.likes:
+            self.likes.remove(username)
     
     def undislike_video(self, username: str) -> None:
         """
         remove username from disliked set!
         """
-        self.dislikes.remove(username)
+        if username in self.dislikes:
+            self.dislikes.remove(username)
     
     def get_videos_by_username(self, username: str) -> list:
         """
@@ -125,6 +128,12 @@ class Video():
         returns the number of dislikes on this video!
         """
         return len(self.dislikes)
+    
+    def add_tag(self, tag: str) -> None:
+        """
+        adds a tag to video!
+        """
+        self.tags.append(tag)
 
     def from_json(json: dict):
         video = Video(json['video_id'],json['title'],json['description']
@@ -132,13 +141,18 @@ class Video():
         video.is_available = json['is_available']
         video.comments = [Comment.from_json(comment) for comment in json['comments']]
         video.video_path = json['video_path']
+        video.tags = json['tags']
         video.likes = json['likes']
         video.dislikes = json['dislikes']
         return video
 
+
     def __str__(self) -> str:
         return "id: {} \n" .format(self.video_id) \
-            + "title: {} \n" .format(self.title) \
+            + "Is available: {} \n" .format(self.is_available) \
+            + "tags: \n\t" \
+            + "\n\t" .join([tag for tag in self.tags]) \
+            + "\ntitle: {} \n" .format(self.title) \
             + "description: {} \n" .format(self.description) \
             + "Likes: {} \n" .format(str(self.count_likes())) \
             + "DisLikes: {} \n" .format(str(self.count_dislikes())) \

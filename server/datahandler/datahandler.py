@@ -83,8 +83,13 @@ class DataHandler:
             videos = json.load(f)
         return [Video.from_json(video) for video in videos]
 
-    def get_video_by_id():
-        pass
+    def get_video_by_id(self, video_id: int):
+        videos = self.get_videos()
+        for video in videos:
+            print(video.video_id , video_id)
+            if video.video_id == video_id:
+                return video
+        raise KeyError(f"Video {video_id} not found!")
         # TODO: Soheil
 
     def count_videos(self) -> int:
@@ -107,12 +112,8 @@ class DataHandler:
         self.add_video(video)
 
     def count_comments_of_video(self, video: Video) -> int:
-        # TODO: Soheil: use get_video_by_id()
-        videos = self.get_videos()
-        for single_video in videos:
-            if single_video.video_id == video.video_id:
-                return len(single_video.comments)
-        return 0  # this should never happen!
+        video = self.get_video_by_id(video.video_id)
+        return len(video.comments)
 
     def get_tickets(self) -> List[Ticket]:
         with open(os.path.join(self.data_directory, self.TICKET_FILE), "r") as f:
