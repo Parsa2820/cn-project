@@ -1,4 +1,3 @@
-from gpg import Data
 from datahandler.datahandler import DataHandler
 from controller.account.account_controller import *
 from controller.support.ticket_controller import *
