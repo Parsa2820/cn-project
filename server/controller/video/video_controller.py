@@ -97,16 +97,21 @@ def ban_video(datahandler: DataHandler, username: str, video_id:int) -> str:
     if account.account_type == "user":
         raise PermissionError("You don't have the permission to ban videos!")
     video = datahandler.get_video_by_id(int(video_id))
-    check_ban_user(datahandler, username, video.uploader_username)
+    check_ban_user(datahandler, video.uploader_username)
     video.ban_video()
     datahandler.update_video(video)
     return str(video)
 
-def check_ban_user(datahandler: DataHandler,admin_username: str, username: str):
+def get_banned_videos_username(datahandler: DataHandler) -> str:
+    videos = datahandler.get_videos()
+    return [video.uploader_username for video in videos if not video.is_available]
+
+
+def check_ban_user(datahandler: DataHandler, username: str):
     account = datahandler.get_account_by_username(username)
-    banned_videos = get_banned_videos(datahandler, admin_username)
-    for video in banned_videos.split('\n'):
-        if video.split(' ')[0] == username:
+    banned_videos_username = get_banned_videos_username(datahandler)
+    for video_user in banned_videos_username:
+        if video_user == username:
             account.is_banned = True
             datahandler.update_account(account)
             return 
