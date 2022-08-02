@@ -5,7 +5,8 @@ from controller.video.video_controller import *
 
 public_functions = {
     "login": login,
-    "register": register_user,
+    "register_user": register_user,
+    "register_admin": register_admin,
     "get_available_videos": get_available_videos_public,
     "watch_video" : watch_video_public
     # TODO: Add public functions here
@@ -34,7 +35,11 @@ private_functions = {
     "upload_video": upload_video,
     "ban_video": ban_video,
     "unban_video": unban_video,
-    "add_tag" : add_tag
+    "add_tag" : add_tag,
+    #account related commands
+    "unban_account": unban_account, #admin
+    "reject_admin_account": reject_admin_account, #manager
+    "accept_admin_account": accept_admin_account #manager
     # TODO: Add private functions here
 }
 

@@ -1,6 +1,8 @@
 # TODO: Soheil
 from datahandler.datahandler import DataHandler
 from models.video.video import Video
+from server.controller.account.account_controller import unban_account
+
 
 def get_all_videos(datahandler: DataHandler, username: str) -> str:
     # TODO: user type check!
@@ -36,6 +38,8 @@ def upload_video(datahandler: DataHandler, username: str, title: str, descriptio
     account = datahandler.get_account_by_username(username)
     if account.account_type != "user":
         raise PermissionError("You don't have the permission to upload video!")
+    if account.is_banned:
+        raise PermissionError("You are banned!")
     # TODO: actually uploading the video!
     video_id = datahandler.count_videos()
     new_video = Video(video_id, title, description, username)
@@ -93,9 +97,19 @@ def ban_video(datahandler: DataHandler, username: str, video_id:int) -> str:
     if account.account_type == "user":
         raise PermissionError("You don't have the permission to ban videos!")
     video = datahandler.get_video_by_id(int(video_id))
+    check_ban_user(datahandler, username, video.uploader_username)
     video.ban_video()
     datahandler.update_video(video)
     return str(video)
+
+def check_ban_user(datahandler: DataHandler,admin_username: str, username: str):
+    account = datahandler.get_account_by_username(username)
+    banned_videos = get_banned_videos(datahandler, admin_username)
+    for video in banned_videos.split('\n'):
+        if video.split(' ')[0] == username:
+            account.is_banned = True
+            datahandler.update_account(account)
+            return 
 
 def unban_video(datahandler: DataHandler, username: str, video_id: int) -> str:
     # TODO: check user type!

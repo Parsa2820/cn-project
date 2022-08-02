@@ -4,12 +4,14 @@ import json
 from models.account.account import Account
 from models.support.ticket import Ticket
 from models.video.video import Video
+from models.account.request import Request
 
 
 class DataHandler:
     ACCOUNTS_FILE = "accounts.json"
     VIDEOS_FILE = "videos.json"
     TICKET_FILE = "tickets.json"
+    REQUEST_FILE = "requests.json"
     DEFUALTS = [
         Account("public", "_", "_"),
         # Account("manager", "manager", "supreme_manager#2022")
@@ -35,7 +37,8 @@ class DataHandler:
     def __exist_files(self) -> bool:
         return os.path.exists(os.path.join(self.data_directory, self.ACCOUNTS_FILE)) and \
             os.path.exists(os.path.join(self.data_directory, self.VIDEOS_FILE)) and \
-            os.path.exists(os.path.join(self.data_directory, self.TICKET_FILE))
+            os.path.exists(os.path.join(self.data_directory, self.TICKET_FILE)) and \
+            os.path.exists(os.path.join(self.data_directory, self.REQUEST_FILE))
 
     def __init_files(self) -> None:
         empty = []
@@ -45,6 +48,35 @@ class DataHandler:
             json.dump(empty, f)
         with open(os.path.join(self.data_directory, self.TICKET_FILE), "w") as f:
             json.dump(empty, f)
+        with open(os.path.join(self.data_directory, self.REQUEST_FILE), "w") as f:
+            json.dump(empty, f)
+
+    def get_requests(self) -> List[Request]:
+        with open(os.path.join(self.data_directory, self.REQUEST_FILE), "r") as f:
+            requests = json.load(f)
+        return [Request.from_json(request) for request in requests]
+
+    def get_request_by_id(self, request_id: int) -> Request:
+        requests = self.get_requests()
+        for request in requests:
+            if request.request_id == request_id:
+                return request
+        raise KeyError(f"Request {request_id} not found")
+
+    def add_request(self, request: Request) -> None:
+        requests = self.get_requests()
+        requests.append(request)
+        with open(os.path.join(self.data_directory, self.REQUEST_FILE), "w") as f:
+            json.dump(requests, f, default=lambda o: o.__dict__, indent=4)
+
+    def update_request(self, request: Request) -> None:
+        requests = self.get_requests()
+        requests = [
+            request for request in requests if request.request_id != request.request_id]
+        requests.append(request)
+        with open(os.path.join(self.data_directory, self.REQUEST_FILE), "w") as f:
+            json.dump(requests, f, default=lambda o: o.__dict__, indent=4)
+
 
     def get_accounts(self) -> List[Account]:
         with open(os.path.join(self.data_directory, self.ACCOUNTS_FILE), "r") as f:
