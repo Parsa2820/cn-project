@@ -189,3 +189,7 @@ cython_debug/
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
+
+./server/test_data/
+./test_data/
+./data/
