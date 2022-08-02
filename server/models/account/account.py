@@ -9,7 +9,9 @@ class Account:
         self.is_banned: bool = False
 
     def from_json(json_data: dict):
-        return Account(json_data["account_type"], json_data["username"], json_data["password"], json_data["is_banned"])
+        account = Account(json_data["account_type"], json_data["username"], json_data["password"])
+        account.is_banned = json_data["is_banned"]
+        return account
 
     def __str__(self):
         return "{} {}".format(self.account_type, self.username)

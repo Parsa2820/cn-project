@@ -1,7 +1,7 @@
 # TODO: Soheil
 from datahandler.datahandler import DataHandler
 from models.video.video import Video
-from server.controller.account.account_controller import unban_account
+from controller.account.account_controller import unban_account
 
 
 def get_all_videos(datahandler: DataHandler, username: str) -> str:

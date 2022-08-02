@@ -1,7 +1,12 @@
+import inspect
+from typing import Callable
+
+from grpc import Call
 from datahandler.datahandler import DataHandler
 from controller.account.account_controller import *
 from controller.support.ticket_controller import *
 from controller.video.video_controller import *
+from common.errors import PermissionError
 
 public_functions = {
     "login": login,
@@ -9,7 +14,6 @@ public_functions = {
     "register_admin": register_admin,
     "get_available_videos": get_available_videos_public,
     "watch_video" : watch_video_public
-    # TODO: Add public functions here
 }
 
 private_functions = {
@@ -23,10 +27,8 @@ private_functions = {
     "close_ticket": close_ticket,
     #Video related commands!
     "get_videos_by_username": get_videos_by_username,
-    "get_all_videos": get_all_videos,
-    "get_available_videos": get_available_videos,
+    "get_banned_and_normal_videos": get_all_videos,
     "get_banned_videos": get_banned_videos,
-    "watch_video": watch_video,
     "like_video": like_video,
     "dislike_video": dislike_video,
     "unlike_video": unlike_video,
@@ -44,22 +46,46 @@ private_functions = {
 }
 
 
+def generate_funtion_help(name: str, f: Callable) -> str:
+    """
+    Generates the help message for a funtion.
+    """
+    args = inspect.getfullargspec(f).args[1:]
+    return f"{name} {' '.join(args)}"
+
+
+def generate_help() -> str:
+    """
+    Generates the help message for the commands.
+    """
+    funtions_help = []
+    for key, value in public_functions.items():
+        funtions_help.append(generate_funtion_help(key, value))
+    for key, value in private_functions.items():
+        funtions_help.append(generate_funtion_help(key, value))
+    return "\n".join(funtions_help)
+
+
 def process(datahandler:DataHandler, input: str) -> str:
     """
     Processes the command and returns the result.
     """
+    if input.startswith("help"):
+        return generate_help()
     try:
         command, username, password, *args = input.lower().split()
         if (username, password) == ("_", "_"):
             return public_functions[command](datahandler, *args)
         else:
             if login_ok(datahandler, username, password):
-                return private_functions[command](datahandler, *args)
+                try:
+                    return public_functions[command](datahandler, *args)
+                except KeyError:
+                    return private_functions[command](datahandler, *args)
             else:
                 return "Login failed"
     except ValueError:
         return "Invalid command"
-    except TypeError as e:
-        return "Error: " + str(e)
-    except KeyError as e:
+    except TypeError and KeyError and PermissionError as e:
+        print(e.__traceback__)
         return "Error: " + str(e)
