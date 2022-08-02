@@ -77,14 +77,13 @@ def process(datahandler:DataHandler, input: str) -> str:
             return public_functions[command](datahandler, *args)
         else:
             if login_ok(datahandler, username, password):
-                try:
+                if command in public_functions.keys():
                     return public_functions[command](datahandler, *args)
-                except KeyError:
+                elif command in private_functions.keys():
                     return private_functions[command](datahandler, *args)
+                else:
+                    return "Command not found"
             else:
                 return "Login failed"
-    except ValueError:
-        return "Invalid command"
-    except TypeError and KeyError and PermissionError as e:
-        print(e.__traceback__)
+    except (TypeError, KeyError, PermissionError) as e:
         return "Error: " + str(e)

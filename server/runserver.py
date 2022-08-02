@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S', format='%(a
 
 
 def run() -> None:
-    datahandler = DataHandler("../data", True)
+    datahandler = DataHandler("./test_data", True)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(('localhost', PORT))
     server.listen(5)
