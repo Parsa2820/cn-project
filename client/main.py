@@ -7,7 +7,7 @@ USERNAME = "_"
 PASSWORD = "_"
 LOGGED_IN = False 
 MENU = []
-PROMPT = "\nEnter menu item number: "
+PROMPT = "\nEnter menu item number (or type logout/exit): "
 
 
 def run() -> None:
@@ -42,7 +42,6 @@ def init_menus():
     entries = [e.split(' ') for e in entries]
     global MENU
     MENU = [(e[0], e[1:]) for e in entries]
-    print(MENU)
     
 
 def print_menu() -> None:
@@ -64,21 +63,21 @@ def generate_command() -> str:
         return action
     params_value = []
     for param in MENU[action][1]:
-        if not MENU[action][0].startswith("register"):
+        if MENU[action][0].startswith("register") or MENU[action][0].startswith("login"):
+            params_value.append(input(f"{param}: "))
+        else:
             if param == "username":
                 params_value.append(USERNAME)
             elif param == "password":
                 params_value.append(PASSWORD)
             else:
                 params_value.append(input(f"{param}: "))
-        else:
-            params_value.append(input(f"{param}: "))
     return f"{MENU[action][0]} {USERNAME} {PASSWORD} {' '.join(params_value)}"
 
 
 def login() -> bool:
     print("1-Login\n2-Continue as a guest")
-    login = input(PROMPT) == "1"
+    login = input("Enter item number (other inputs threated as second item): ") == "1"
     if login:
         username = input("Username: ")
         password = input("Password: ")
