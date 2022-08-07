@@ -13,11 +13,11 @@ public_functions = {
     "register_user": register_user,
     "register_admin": register_admin,
     "get_available_videos": get_available_videos_public,
-    "watch_video" : watch_video_public
+    "watch_video": watch_video
 }
 
 private_functions = {
-    #Support related commands!
+    # Support related commands!
     "get_tickets": get_tickets,
     "create_ticket": create_ticket,
     "reply_ticket": reply_ticket,
@@ -25,7 +25,7 @@ private_functions = {
     "pend_ticket": pend_ticket,
     "resolve_ticket": resolve_ticket,
     "close_ticket": close_ticket,
-    #Video related commands!
+    # Video related commands!
     "get_videos_by_username": get_videos_by_username,
     "get_banned_and_normal_videos": get_all_videos,
     "get_banned_videos": get_banned_videos,
@@ -67,7 +67,7 @@ def generate_help() -> str:
     return "\n".join(funtions_help)
 
 
-def process(datahandler:DataHandler, input: str) -> str:
+def process(datahandler: DataHandler, input: str) -> str:
     """
     Processes the command and returns the result.
     """
