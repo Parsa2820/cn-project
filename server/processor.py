@@ -1,5 +1,6 @@
 import inspect
 from typing import Callable
+import logging
 
 from datahandler.datahandler import DataHandler
 from controller.account.account_controller import *
@@ -86,4 +87,5 @@ def process(datahandler:DataHandler, input: str) -> str:
             else:
                 return "Login failed"
     except (TypeError, KeyError, PermissionError) as e:
+        logging.error(e)
         return "Error: " + str(e)

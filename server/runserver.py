@@ -6,9 +6,8 @@ from datahandler.datahandler import DataHandler
 
 PORT = 2820
 TRUSTED_PROXIES = [
-    "localhost",
+    "127.0.0.1",
 ]
-logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)s: %(message)s')
 
 
 def run() -> None:
@@ -43,6 +42,7 @@ def handle(datahandler: DataHandler, client: socket.socket, address: tuple) -> N
         response = processor.process(datahandler, command)
     else:
         response = "You are admin, but you are not connected through the proxy!"
+        logging.error(response + " from " + str(address))
     logging.info(f"Sending response: {response} to {address}")
     client.send(response.encode())
     logging.info(f"Closing connection to {address}")

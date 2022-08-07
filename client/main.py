@@ -11,7 +11,7 @@ PROMPT = "\nEnter menu item number (or type logout/exit): "
 
 
 def run() -> None:
-    init_menus()
+    os.system('cls' if os.name == 'nt' else 'clear')
     while not login():
         print("Login failed. Please retry")
     print("Login successfull")
@@ -26,7 +26,7 @@ def run() -> None:
         client.connect(('localhost', PORT))
         client.send(command.encode())
         response = client.recv(1024).decode()
-        print(response)
+        print(response.replace("%20", " "))
         client.close()
         _ = input("\nPress enter to continue")
         command = generate_command()
@@ -54,6 +54,9 @@ def get_command_parameters(parameters: list) -> list:
     return [input(f"{parameter}: ") for parameter in parameters]
 
 
+def read_param(param: str) -> str:
+    return input(f"{param}: ").replace(" ", "%20")
+
 def generate_command() -> str:
     print_menu()
     action = input(PROMPT)
@@ -64,14 +67,14 @@ def generate_command() -> str:
     params_value = []
     for param in MENU[action][1]:
         if MENU[action][0].startswith("register") or MENU[action][0].startswith("login"):
-            params_value.append(input(f"{param}: "))
+            params_value.append(read_param(param))
         else:
             if param == "username":
                 params_value.append(USERNAME)
             elif param == "password":
                 params_value.append(PASSWORD)
             else:
-                params_value.append(input(f"{param}: "))
+                params_value.append(read_param(param))
     return f"{MENU[action][0]} {USERNAME} {PASSWORD} {' '.join(params_value)}"
 
 
@@ -108,4 +111,5 @@ def logout() -> None:
 
 
 if __name__ == '__main__':
+    init_menus()
     run()

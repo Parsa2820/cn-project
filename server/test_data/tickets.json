@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "id": 1,
+        "account": {
+            "account_type": "manager",
+            "username": "manager",
+            "password": "123",
+            "is_banned": false
+        },
+        "message": "salam%20khubi",
+        "status": "new",
+        "replies": []
+    }
+]
