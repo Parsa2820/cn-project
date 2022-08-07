@@ -146,7 +146,7 @@ def video_stream(client_socket, BUFF_SIZE):
     while True:
         packet, _ = client_socket.recvfrom(BUFF_SIZE)
         data = base64.b64decode(packet, ' /')
-        npdata = np.fromstring(data, dtype=np.uint8)
+        npdata = np.frombuffer(data, dtype=np.uint8)
 
         frame = cv2.imdecode(npdata, 1)
         frame = cv2.putText(frame, 'FPS: '+str(fps), (10, 40),
@@ -156,7 +156,7 @@ def video_stream(client_socket, BUFF_SIZE):
 
         if key == ord('q'):
             client_socket.close()
-            os._exit(1)
+            # os._exit(1)
             break
 
         if cnt == frames_to_count:
@@ -167,6 +167,7 @@ def video_stream(client_socket, BUFF_SIZE):
             except:
                 pass
         cnt += 1
+
     client_socket.close()
     cv2.destroyAllWindows()
 

@@ -83,6 +83,10 @@ def __receive_file(server_socket: socket.socket, video: Video) -> None:
                 break
             f.write(data)
     logging.info(f'file {video.video_id} has been Received!')
+    filename = video.video_path
+    command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(
+        filename, f'{filename}.wav')
+    os.system(command)
     server_socket.close()
 
 
@@ -193,11 +197,13 @@ def watch_video(datahandler: DataHandler, video_id: int) -> str:
 def __start_streaming(video_socket: socket.socket, audio_socket: socket.socket, video: Video):
     q = queue.Queue(maxsize=10)
     filename = video.video_path
-    command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(
-        filename, f'{filename}.wav')
-    os.system(command)
+    #command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(
+    #    filename, f'{filename}.wav')
+    #if(not os.path.exists(filename + '.wav')):  
+    #    os.system(command)
     path = os.getcwd()
     vid = cv2.VideoCapture(path + '/' + filename)
+    print(path + '/' + filename)
     FPS = vid.get(cv2.CAP_PROP_FPS)
     global TS
     TS = (0.5/FPS)
@@ -224,7 +230,8 @@ def __video_stream_gen(vid, q: queue):
             frame = imutils.resize(frame, width=WIDTH)
             q.put(frame)
         except:
-            os._exit(1)
+            break
+            #os._exit(1)
     print('Player closed')
     BREAK = True
     vid.release()
@@ -233,8 +240,8 @@ def __video_stream_gen(vid, q: queue):
 def __video_stream(server_socket, BUFF_SIZE, q, FPS):
     global TS
     fps, st, frames_to_count, cnt = (0, 0, 1, 0)
-    cv2.namedWindow('TRANSMITTING VIDEO')
-    cv2.moveWindow('TRANSMITTING VIDEO', 10, 30)
+    #cv2.namedWindow('TRANSMITTING VIDEO')
+    #cv2.moveWindow('TRANSMITTING VIDEO', 10, 30)
     while True:
         msg, client_addr = server_socket.recvfrom(BUFF_SIZE)
         print('GOT connection from ', client_addr)
@@ -246,8 +253,8 @@ def __video_stream(server_socket, BUFF_SIZE, q, FPS):
                 '.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
             message = base64.b64encode(buffer)
             server_socket.sendto(message, client_addr)
-            frame = cv2.putText(frame, 'FPS: '+str(round(fps, 1)),
-                                (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            #frame = cv2.putText(frame, 'FPS: '+str(round(fps, 1)),
+            #                    (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             if cnt == frames_to_count:
                 try:
                     fps = (frames_to_count/(time.time()-st))
@@ -263,10 +270,10 @@ def __video_stream(server_socket, BUFF_SIZE, q, FPS):
                     pass
             cnt += 1
 
-            cv2.imshow('TRANSMITTING VIDEO', frame)
+            #cv2.imshow('TRANSMITTING VIDEO', frame)
             key = cv2.waitKey(int(1000*TS)) & 0xFF
             if key == ord('q'):
-                os._exit(1)
+                #os._exit(1)
                 TS = False
                 break
 
