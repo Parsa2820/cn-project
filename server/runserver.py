@@ -11,7 +11,7 @@ TRUSTED_PROXIES = [
 
 
 def run() -> None:
-    datahandler = DataHandler("./test_data", True)
+    datahandler = DataHandler("server\\test_data", True)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(('localhost', PORT))
     server.listen(5)

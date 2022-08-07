@@ -23,7 +23,8 @@ class DataHandler:
         self.__check_data_directory(clear)
 
     def __check_data_directory(self, clear: bool) -> None:
-        if not os.path.exists(self.data_directory):
+        #print(os.path.join(os.getcwd(), self.data_directory))
+        if not os.path.exists(os.path.join(os.getcwd(), self.data_directory)):
             raise Exception("Data directory does not exist")
         if len(os.listdir(self.data_directory)) > 0:
             if not self.__exist_files():
