@@ -154,6 +154,7 @@ class DataHandler:
         return [Ticket.from_json(ticket) for ticket in tickets]
 
     def get_ticket_by_id(self, ticket_id: int) -> Ticket:
+        ticket_id = int(ticket_id)
         tickets = self.get_tickets()
         for ticket in tickets:
             if ticket.id == ticket_id:

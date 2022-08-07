@@ -49,51 +49,59 @@ def register_admin(datahandler: DataHandler, username: str, password: str) -> st
         datahandler.add_request(request)
         return "request sent"
 
-def accept_admin_account(datahandler: DataHandler, manager_username:str, username: str) -> str:
+def accept_admin_account(datahandler: DataHandler, username:str, admin_username: str) -> str:
     """
     Accepts the account.
     """
-    manager_account = datahandler.get_account_by_username(manager_username)
+    manager_account = datahandler.get_account_by_username(username)
     if manager_account.account_type != "manager":
         raise PermissionError("You don't have the permission to accept user!")
     try:
-        request = datahandler.get_request_by_id(username)
+        request = datahandler.get_request_by_id(admin_username)
     except KeyError:
         return "Request does not exist"
     request.status = "accepted"
     datahandler.update_request(request)
-    account = Account("admin", username, request.password)
+    account = Account("admin", admin_username, request.password)
     datahandler.add_account(account)
     return "Account accepted"
 
-def reject_admin_account(datahandler: DataHandler, manager_username:str, username: str) -> str:
+def reject_admin_account(datahandler: DataHandler, username:str, admin_username: str) -> str:
     """
     Rejects the account.
     """
-    manager_account = datahandler.get_account_by_username(manager_username)
+    manager_account = datahandler.get_account_by_username(username)
     if manager_account.account_type != "manager":
         raise PermissionError("You don't have the permission to reject user!")
     try:
-        request = datahandler.get_request_by_id(username)
+        request = datahandler.get_request_by_id(admin_username)
     except KeyError:
         return "Request does not exist"
     request.status = "rejected"
     datahandler.update_request(request)
     return "Account rejected"
 
-def unban_account(datahandler: DataHandler, admin_username: str, username: str) -> str:
+def unban_account(datahandler: DataHandler, username: str, user_username: str) -> str:
     """
     Unbans the account.
     """
-    admin_account = datahandler.get_account_by_username(admin_username)
+    admin_account = datahandler.get_account_by_username(username)
     if admin_account.account_type != "admin":
         raise PermissionError("You don't have the permission to unban user!")
     try:
-        account = datahandler.get_account_by_username(username)
+        account = datahandler.get_account_by_username(user_username)
     except KeyError:
         return "Account does not exist"
     account.is_banned = False
     datahandler.update_account(account)
     return "Account unbanned"
 
-# TODO: SARA
+def get_requests(datahandler: DataHandler, username: str) -> str:
+    """
+    Gets the requests.
+    """
+    user = datahandler.get_account_by_username(username)
+    if user.account_type != "manager":
+        raise PermissionError("You don't have the permission to get requests!")
+    requests = datahandler.get_requests()
+    return '\n'.join(str(request) for request in requests)
