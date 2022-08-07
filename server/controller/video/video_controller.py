@@ -17,6 +17,7 @@ import logging
 from datahandler.datahandler import DataHandler
 from models.video.video import Video
 from controller.account.account_controller import unban_account
+from common.errors import PermissionError
 
 
 def get_all_videos(datahandler: DataHandler, username: str) -> str:

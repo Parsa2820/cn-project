@@ -39,7 +39,8 @@ def run() -> None:
         print(response.replace("%20", " "))
         client.close()
         if command.startswith("upload_video"):
-            send_data(int(response.strip()), input("Enter file path: "))
+            if(not response.startswith("Error")):
+                send_data(int(response.strip()), input("Enter file path: "))
         if command.startswith("watch_video"):
             video_port, audio_port = map(int, response.split(' '))
             watch_video(video_port, audio_port)
