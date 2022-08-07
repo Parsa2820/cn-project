@@ -5,6 +5,9 @@ import logging
 from datahandler.datahandler import DataHandler
 
 PORT = 2820
+TRUSTED_PROXIES = [
+    "localhost",
+]
 logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S', format='%(asctime)s %(levelname)s: %(message)s')
 
 
@@ -36,8 +39,22 @@ def listen(datahandler: DataHandler, server: socket.socket) -> None:
 def handle(datahandler: DataHandler, client: socket.socket, address: tuple) -> None:
     command = client.recv(1024).decode()
     logging.info(f"Received command: {command} from {address}")
-    response = processor.process(datahandler, command)
+    if check_proxy_for_admin(datahandler, client, address, command):
+        response = processor.process(datahandler, command)
+    else:
+        response = "You are admin, but you are not connected through the proxy!"
     logging.info(f"Sending response: {response} to {address}")
     client.send(response.encode())
     logging.info(f"Closing connection to {address}")
     client.close()
+
+
+def check_proxy_for_admin(datahandler: DataHandler, client: socket.socket, address: tuple, command: str) -> bool:
+    try:
+        username = command.split(" ")[1]
+        account = datahandler.get_account_by_username(username)
+    except:
+        return True
+    if account.account_type == "admin" or account.account_type == "manager":
+        return address[0] in TRUSTED_PROXIES
+    return True
