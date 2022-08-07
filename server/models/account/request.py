@@ -8,7 +8,7 @@ class Request:
         self.status: str = "pending"
 
     def from_json(json_data: dict):
-        return Request(json_data["status"], json_data["username"], json_data["password"])
+        return Request(json_data["username"], json_data["password"])
 
     def __str__(self):
         return "{} {}".format(self.status, self.username)

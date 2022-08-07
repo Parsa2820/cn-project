@@ -1,7 +1,6 @@
 import inspect
 from typing import Callable
 
-from grpc import Call
 from datahandler.datahandler import DataHandler
 from controller.account.account_controller import *
 from controller.support.ticket_controller import *
