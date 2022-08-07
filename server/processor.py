@@ -13,11 +13,11 @@ public_functions = {
     "register_user": register_user,
     "register_admin": register_admin,
     "get_available_videos": get_available_videos_public,
-    "watch_video" : watch_video_public
+    "watch_video": watch_video
 }
 
 private_functions = {
-    #Support related commands!
+    # Support related commands!
     "get_tickets": get_tickets,
     "create_ticket": create_ticket,
     "reply_ticket": reply_ticket,
@@ -25,7 +25,7 @@ private_functions = {
     "pend_ticket": pend_ticket,
     "resolve_ticket": resolve_ticket,
     "close_ticket": close_ticket,
-    #Video related commands!
+    # Video related commands!
     "get_videos_by_username": get_videos_by_username,
     "get_banned_and_normal_videos": get_all_videos,
     "get_banned_videos": get_banned_videos,
@@ -37,11 +37,11 @@ private_functions = {
     "upload_video": upload_video,
     "ban_video": ban_video,
     "unban_video": unban_video,
-    "add_tag" : add_tag,
-    #account related commands
-    "unban_account": unban_account, #admin
-    "reject_admin_account": reject_admin_account, #manager
-    "accept_admin_account": accept_admin_account #manager
+    "add_tag": add_tag,
+    # account related commands
+    "unban_account": unban_account,  # admin
+    "reject_admin_account": reject_admin_account,  # manager
+    "accept_admin_account": accept_admin_account  # manager
     # TODO: Add private functions here
 }
 
@@ -66,7 +66,7 @@ def generate_help() -> str:
     return "\n".join(funtions_help)
 
 
-def process(datahandler:DataHandler, input: str) -> str:
+def process(datahandler: DataHandler, input: str) -> str:
     """
     Processes the command and returns the result.
     """
