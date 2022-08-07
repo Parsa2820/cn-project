@@ -42,6 +42,7 @@ def init_menus():
     entries = [e.split(' ') for e in entries]
     global MENU
     MENU = [(e[0], e[1:]) for e in entries]
+    print(MENU)
     
 
 def print_menu() -> None:
@@ -68,6 +69,8 @@ def generate_command() -> str:
                 params_value.append(USERNAME)
             elif param == "password":
                 params_value.append(PASSWORD)
+            else:
+                params_value.append(input(f"{param}: "))
         else:
             params_value.append(input(f"{param}: "))
     return f"{MENU[action][0]} {USERNAME} {PASSWORD} {' '.join(params_value)}"
