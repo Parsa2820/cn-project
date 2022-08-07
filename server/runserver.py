@@ -42,7 +42,7 @@ def listen(datahandler: DataHandler, server: socket.socket) -> None:
     while True:
         client, address = server.accept()
         logging.info(f"Accepted connection from {address}")
-        if address[0] in DDOS_BLACKLIST:
+        if address[0] in DDOS_BLACKLIST and address[0] not in TRUSTED_PROXIES:
             logging.info(
                 f"{address} is in the DDOS blacklist, closing connection")
             client.close()
