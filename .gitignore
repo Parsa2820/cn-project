@@ -190,6 +190,6 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 
-./server/test_data/
-./test_data/
-./data/
+test_data
+server/test_data
+data

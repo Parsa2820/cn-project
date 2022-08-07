@@ -8,6 +8,10 @@ PORT = 2820
 TRUSTED_PROXIES = [
     "127.0.0.1",
 ]
+REQUEST_COUNT_BY_ADDRESS = {}
+DDOS_TIME_WINDOW_SECONDS = 10
+DDOS_THRESHOLD = 10
+DDOS_BLACKLIST = []
 
 
 def run() -> None:
@@ -18,6 +22,7 @@ def run() -> None:
     logging.info(f"Listening on port {PORT}")
     threading.Thread(target=listen, args=(
         datahandler, server), daemon=True).start()
+    threading.Timer(DDOS_TIME_WINDOW_SECONDS, clear_ddos_blacklist).start()
     while True:
         try:
             _ = input()
@@ -27,12 +32,33 @@ def run() -> None:
             exit()
 
 
+def clear_ddos_blacklist() -> None:
+    global DDOS_BLACKLIST
+    DDOS_BLACKLIST = []
+    threading.Timer(DDOS_TIME_WINDOW_SECONDS, clear_ddos_blacklist).start()
+
+
 def listen(datahandler: DataHandler, server: socket.socket) -> None:
     while True:
         client, address = server.accept()
         logging.info(f"Accepted connection from {address}")
+        if address[0] in DDOS_BLACKLIST and address[0] not in TRUSTED_PROXIES:
+            logging.info(
+                f"{address} is in the DDOS blacklist, closing connection")
+            client.close()
+            continue
+        detect_ddos(address)
         threading.Thread(target=handle, args=(
             datahandler, client, address), daemon=True).start()
+
+
+def detect_ddos(address: tuple) -> None:
+    if address[0] in REQUEST_COUNT_BY_ADDRESS:
+        REQUEST_COUNT_BY_ADDRESS[address[0]] += 1
+    else:
+        REQUEST_COUNT_BY_ADDRESS[address[0]] = 1
+    if REQUEST_COUNT_BY_ADDRESS[address[0]] > DDOS_THRESHOLD:
+        DDOS_BLACKLIST.append(address[0])
 
 
 def handle(datahandler: DataHandler, client: socket.socket, address: tuple) -> None:
