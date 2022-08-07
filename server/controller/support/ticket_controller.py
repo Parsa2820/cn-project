@@ -69,7 +69,16 @@ def close_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> str
 
 
 def __check_ticket_permission(ticket: Ticket, account: Account) -> None:
-    if ticket.account.account_type == "user" and ticket.account.username != account.username:
-        raise PermissionError("You can only modify your own tickets")
-    if ticket.account.account_type == "admin" and ticket.account.username != account.username:
-        raise PermissionError("You can only modify your own and user tickets")
+    print(ticket.account.username, account.username)
+    if account.account_type == "manager":
+        if ticket.account.account_type == "user":
+            raise PermissionError("only admins can change user tickets")
+        else: return
+    elif account.account_type == "user":
+        if ticket.account.username != account.username:
+            raise PermissionError("You can only modify your own tickets")
+        else: return
+    elif account.account_type == "admin":
+        if ticket.account.username != account.username and ticket.account.account_type != "user":
+            raise PermissionError("You can only modify your own and user tickets")
+        else: return

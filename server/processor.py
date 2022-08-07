@@ -21,7 +21,7 @@ private_functions = {
     "get_tickets": get_tickets,
     "create_ticket": create_ticket,
     "reply_ticket": reply_ticket,
-    "new_ticket": new_ticket,
+    "new_ticket": new_ticket, #4 status
     "pend_ticket": pend_ticket,
     "resolve_ticket": resolve_ticket,
     "close_ticket": close_ticket,
@@ -41,7 +41,8 @@ private_functions = {
     #account related commands
     "unban_account": unban_account, #admin
     "reject_admin_account": reject_admin_account, #manager
-    "accept_admin_account": accept_admin_account #manager
+    "accept_admin_account": accept_admin_account, #manager
+    "get_requests": get_requests #manager
     # TODO: Add private functions here
 }
 
