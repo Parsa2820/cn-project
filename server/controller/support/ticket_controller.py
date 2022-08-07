@@ -24,17 +24,24 @@ def create_ticket(datahandler: DataHandler, username: str, message: str) -> str:
 
 
 def reply_ticket(datahandler: DataHandler, username: str, ticket_id: int, message: str) -> str:
-    account = datahandler.get_account_by_username(username)
     ticket = datahandler.get_ticket_by_id(ticket_id)
+    if ticket.status == "closed":
+        raise PermissionError("Ticket is closed")
+    account = datahandler.get_account_by_username(username)
     __check_ticket_permission(ticket, account)
     ticket.replies.append(Reply(account, message))
+    ticket.to_pending()
+    if account.account_type != "user":
+        ticket.to_resolved()
     datahandler.update_ticket(ticket)
     return str(ticket)
 
 
 def new_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> str:
-    account = datahandler.get_account_by_username(username)
     ticket = datahandler.get_ticket_by_id(ticket_id)
+    if ticket.status == "closed":
+        raise PermissionError("Ticket is closed")
+    account = datahandler.get_account_by_username(username)
     __check_ticket_permission(ticket, account)
     ticket.to_new()
     datahandler.update_ticket(ticket)
@@ -42,8 +49,10 @@ def new_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> str:
 
 
 def pend_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> str:
-    account = datahandler.get_account_by_username(username)
     ticket = datahandler.get_ticket_by_id(ticket_id)
+    if ticket.status == "closed":
+        raise PermissionError("Ticket is closed")
+    account = datahandler.get_account_by_username(username)
     __check_ticket_permission(ticket, account)
     ticket.to_pending()
     datahandler.update_ticket(ticket)
@@ -51,8 +60,10 @@ def pend_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> str:
 
 
 def resolve_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> str:
-    account = datahandler.get_account_by_username(username)
     ticket = datahandler.get_ticket_by_id(ticket_id)
+    if ticket.status == "closed":
+        raise PermissionError("Ticket is closed")
+    account = datahandler.get_account_by_username(username)
     __check_ticket_permission(ticket, account)
     ticket.to_resolved()
     datahandler.update_ticket(ticket)
@@ -60,8 +71,8 @@ def resolve_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> s
 
 
 def close_ticket(datahandler: DataHandler, username: str, ticket_id: int) -> str:
-    account = datahandler.get_account_by_username(username)
     ticket = datahandler.get_ticket_by_id(ticket_id)
+    account = datahandler.get_account_by_username(username)
     __check_ticket_permission(ticket, account)
     ticket.to_closed()
     datahandler.update_ticket(ticket)
@@ -73,12 +84,16 @@ def __check_ticket_permission(ticket: Ticket, account: Account) -> None:
     if account.account_type == "manager":
         if ticket.account.account_type == "user":
             raise PermissionError("only admins can change user tickets")
-        else: return
+        else:
+            return
     elif account.account_type == "user":
         if ticket.account.username != account.username:
             raise PermissionError("You can only modify your own tickets")
-        else: return
+        else:
+            return
     elif account.account_type == "admin":
         if ticket.account.username != account.username and ticket.account.account_type != "user":
-            raise PermissionError("You can only modify your own and user tickets")
-        else: return
+            raise PermissionError(
+                "You can only modify your own and user tickets")
+        else:
+            return

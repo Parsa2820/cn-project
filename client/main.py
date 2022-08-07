@@ -26,12 +26,14 @@ def run() -> None:
     print("Login successfull")
     _ = input("\nPress enter to continue")
     command = ""
-    while command != "exit":
+    while True:
         command = generate_command()
         print(command)
         if command == "logout":
             logout()
             run()
+        elif command == "exit":
+            break
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(('localhost', PORT))
         client.send(command.encode())
@@ -55,7 +57,8 @@ def init_menus():
     entries = response.split('\n')
     entries = [e.split(' ') for e in entries]
     global MENU
-    MENU = [(e[0], e[1:]) for e in entries]
+    removed = ["login"]
+    MENU = [(e[0], e[1:]) for e in entries if e[0] not in removed]
 
 
 def print_menu() -> None:
@@ -78,7 +81,11 @@ def generate_command() -> str:
     try:
         action = int(action) - 1
     except:
-        return action
+        if action in ["logout", "exit"]:
+            return action
+        print("Invalid input")
+        input("\nPress enter to continue")
+        return generate_command()
     params_value = []
     for param in MENU[action][1]:
         if MENU[action][0].startswith("register") or MENU[action][0].startswith("login"):
