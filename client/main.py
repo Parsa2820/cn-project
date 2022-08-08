@@ -55,7 +55,7 @@ def run() -> None:
         print(response.replace("%20", " "))
         if command.startswith("upload_video"):
             if(not response.startswith("Error")):
-                send_data(int(response.strip()), input("Enter file path: "))
+                send_data(int(response.strip()))
         if command.startswith("watch_video"):
             if (not response.startswith("Error")):
                 video_port, audio_port = map(int, response.split(' '))
@@ -69,7 +69,16 @@ def init_menus():
     entries = [e.split(' ') for e in entries]
     global MENU
     removed = ["login"]
-    MENU = [(e[0], e[1:]) for e in entries if e[0] not in removed]
+    # MENU = [(e[0], e[1:]) for e in entries if e[0] not in removed]
+    MENU = []
+    for e in entries:
+        if e[0] in removed:
+            continue
+        params = []
+        for p in e[1:]:
+            if p:
+                params.append(p)
+        MENU.append((e[0], params))
 
 
 def print_menu() -> None:
@@ -233,14 +242,16 @@ def audio_stream(host_ip, port):
 
 
 # use this after connecting to server socket!
-def send_data(port: int, file_path: str):
+def send_data(port: int):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((ADDRESS, port))
-    f = open(file_path, 'rb')
-    file_size = os.path.getsize(file_path)
-    if file_size > 50_000_000:
-        print("File size is too big")
-        return
+    file_size = 10e10
+    while file_size > 50_000_000:
+        file_path = input("Enter file path: ")
+        f = open(file_path, 'rb')
+        file_size = os.path.getsize(file_path)
+        if file_size > 50_000_000:
+            print("File size is too big")
     l = f.read(1024)
     print('Uploading video...')
     for _ in tqdm.tqdm(range(0, file_size, 1024)):
