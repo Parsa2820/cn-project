@@ -31,12 +31,13 @@ def register_user(datahandler: DataHandler, username: str, password: str) -> str
     Registers the user.
     """
     try:
-        account = datahandler.get_account_by_username(username)
-        return "Username already exists"
+        if(datahandler.get_request_by_id(username) or datahandler.get_account_by_username(username)):
+            return "Username already exists"
     except KeyError:
         account = Account("user", username, password)
         datahandler.add_account(account)
         return "Registration successful"
+
 
 def register_admin(datahandler: DataHandler, username: str, password: str) -> str:
     """
@@ -50,7 +51,8 @@ def register_admin(datahandler: DataHandler, username: str, password: str) -> st
         datahandler.add_request(request)
         return "request sent"
 
-def accept_admin_account(datahandler: DataHandler, username:str, admin_username: str) -> str:
+
+def accept_admin_account(datahandler: DataHandler, username: str, admin_username: str) -> str:
     """
     Accepts the account.
     """
@@ -67,7 +69,8 @@ def accept_admin_account(datahandler: DataHandler, username:str, admin_username:
     datahandler.add_account(account)
     return "Account accepted"
 
-def reject_admin_account(datahandler: DataHandler, username:str, admin_username: str) -> str:
+
+def reject_admin_account(datahandler: DataHandler, username: str, admin_username: str) -> str:
     """
     Rejects the account.
     """
@@ -81,6 +84,7 @@ def reject_admin_account(datahandler: DataHandler, username:str, admin_username:
     request.status = "rejected"
     datahandler.update_request(request)
     return "Account rejected"
+
 
 def unban_account(datahandler: DataHandler, username: str, user_username: str) -> str:
     """
@@ -96,6 +100,7 @@ def unban_account(datahandler: DataHandler, username: str, user_username: str) -
     account.is_banned = False
     datahandler.update_account(account)
     return "Account unbanned"
+
 
 def get_requests(datahandler: DataHandler, username: str) -> str:
     """
