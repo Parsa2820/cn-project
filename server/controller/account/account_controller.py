@@ -1,6 +1,7 @@
 from models.account.account import Account
 from models.account.request import Request
 from datahandler.datahandler import DataHandler
+from common.errors import PermissionError
 
 
 def login_ok(datahandler: DataHandler, username: str, password: str) -> bool:
