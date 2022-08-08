@@ -154,9 +154,11 @@ class Video():
             + "\n\t" .join([tag for tag in self.tags]) \
             + "\ntitle: {} \n" .format(self.title) \
             + "description: {} \n" .format(self.description) \
-            + "Likes: {} \n" .format(str(self.count_likes())) \
-            + "DisLikes: {} \n" .format(str(self.count_dislikes())) \
-            + "Comments: \n\t" \
+            + "Likes: \n\t" \
+            + "\n\t" .join([user for user in self.likes]) \
+            + "\nDisLikes: \n\t" \
+            + "\n\t" .join([user for user in self.dislikes]) \
+            + "\nComments: \n\t" \
             + "\n\t" .join([str(comment) for comment in self.comments])
 
 
