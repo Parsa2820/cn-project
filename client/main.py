@@ -22,6 +22,15 @@ MENU = []
 PROMPT = "\nEnter menu item number (or type logout/exit): "
 
 
+def send_command(command: str) -> str:
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((ADDRESS, PORT))
+    client.send(command.encode())
+    response = client.recv(1024).decode()
+    client.close()
+    return response
+
+
 def run() -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
     while not login():
@@ -37,12 +46,8 @@ def run() -> None:
             run()
         elif command == "exit":
             break
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect((ADDRESS, PORT))
-        client.send(command.encode())
-        response = client.recv(1024).decode()
+        response = send_command(command)
         print(response.replace("%20", " "))
-        client.close()
         if command.startswith("upload_video"):
             if(not response.startswith("Error")):
                 send_data(int(response.strip()), input("Enter file path: "))
@@ -54,10 +59,7 @@ def run() -> None:
 
 
 def init_menus():
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((ADDRESS, PORT))
-    client.send("help".encode())
-    response = client.recv(1024).decode()
+    response = send_command("help")
     entries = response.split('\n')
     entries = [e.split(' ') for e in entries]
     global MENU
@@ -111,11 +113,7 @@ def login() -> bool:
     if login:
         username = input("Username: ")
         password = input("Password: ")
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect((ADDRESS, PORT))
-        client.send(f"login _ _ {username} {password}".encode())
-        response = client.recv(1024).decode()
-        client.close()
+        response = send_command(f"login _ _ {username} {password}")
         if "success" in response:
             global USERNAME
             global PASSWORD
