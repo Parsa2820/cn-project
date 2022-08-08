@@ -10,6 +10,7 @@ import pickle
 import struct
 import tqdm
 import keyboard
+import sys
 
 
 ADDRESS = 'localhost'
@@ -37,7 +38,7 @@ def run() -> None:
         elif command == "exit":
             break
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(('localhost', PORT))
+        client.connect((ADDRESS, PORT))
         client.send(command.encode())
         response = client.recv(1024).decode()
         print(response.replace("%20", " "))
@@ -54,7 +55,7 @@ def run() -> None:
 
 def init_menus():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(('localhost', PORT))
+    client.connect((ADDRESS, PORT))
     client.send("help".encode())
     response = client.recv(1024).decode()
     entries = response.split('\n')
@@ -111,7 +112,7 @@ def login() -> bool:
         username = input("Username: ")
         password = input("Password: ")
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(('localhost', PORT))
+        client.connect((ADDRESS, PORT))
         client.send(f"login _ _ {username} {password}".encode())
         response = client.recv(1024).decode()
         client.close()
@@ -231,7 +232,7 @@ def audio_stream(host_ip, port):
 # use this after connecting to server socket!
 def send_data(port: int, file_path: str):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('localhost', port))
+    s.connect((ADDRESS, port))
     f = open(file_path, 'rb')
     file_size = os.path.getsize(file_path)
     if file_size > 50_000_000:
@@ -255,5 +256,7 @@ if __name__ == '__main__':
     global BREAK
     BREAK = False
     keyboard.add_hotkey('q', lambda: stop_playing())
+    if len(sys.argv) > 1:
+        ADDRESS = sys.argv[1]
     init_menus()
     run()

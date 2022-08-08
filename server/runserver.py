@@ -17,7 +17,7 @@ DDOS_BLACKLIST = []
 def run() -> None:
     datahandler = DataHandler("server/test_data", False)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('localhost', PORT))
+    server.bind(('', PORT))
     server.listen(5)
     logging.info(f"Listening on port {PORT}")
     threading.Thread(target=listen, args=(
