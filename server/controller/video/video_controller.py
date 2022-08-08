@@ -183,6 +183,8 @@ def unban_video(datahandler: DataHandler, username: str, video_id: int) -> str:
 
 def watch_video(datahandler: DataHandler, video_id: int) -> str:
     video = datahandler.get_video_by_id(int(video_id))
+    if not video.is_available:
+        raise PermissionError('Video is Banned!')
     video_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     video_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
     video_socket.bind(('', 0))
