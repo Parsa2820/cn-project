@@ -196,6 +196,7 @@ def watch_video(datahandler: DataHandler, video_id: int) -> str:
 
 
 def __start_streaming(video_socket: socket.socket, audio_socket: socket.socket, video: Video):
+    global BREAK
     q = queue.Queue(maxsize=10)
     filename = video.video_path
     #command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(
@@ -224,6 +225,7 @@ def __start_streaming(video_socket: socket.socket, audio_socket: socket.socket, 
 
 
 def __video_stream_gen(vid, q: queue):
+    global BREAK
     WIDTH = 400
     while(vid.isOpened()):
         try:
@@ -239,16 +241,23 @@ def __video_stream_gen(vid, q: queue):
 
 
 def __video_stream(server_socket, BUFF_SIZE, q, FPS):
-    global TS
+    global TS, BREAK
     fps, st, frames_to_count, cnt = (0, 0, 1, 0)
     #cv2.namedWindow('TRANSMITTING VIDEO')
     #cv2.moveWindow('TRANSMITTING VIDEO', 10, 30)
     while True:
+        #print("IM HERE")
         msg, client_addr = server_socket.recvfrom(BUFF_SIZE)
         print('GOT connection from ', client_addr)
         WIDTH = 400
 
         while(True):
+            if BREAK:
+                server_socket.sendto("finished".encode(), client_addr)
+                server_socket.close()
+                print("socket closed!")
+                return
+            #print("IM HERE")
             frame = q.get()
             encoded, buffer = cv2.imencode(
                 '.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
@@ -272,11 +281,14 @@ def __video_stream(server_socket, BUFF_SIZE, q, FPS):
             cnt += 1
 
             #cv2.imshow('TRANSMITTING VIDEO', frame)
-            key = cv2.waitKey(int(1000*TS)) & 0xFF
-            if key == ord('q'):
+            #time.sleep(int(1000 * TS))
+            #print("IM HERE")
+            cv2.waitKey(int(1000*TS))
+            #print("IM HERE")
+            #if key == ord('q'):
                 #os._exit(1)
-                TS = False
-                break
+            #    TS = False
+            #    break
 
 
 def __audio_stream(audio_socket: socket.socket, video: Video):
@@ -294,10 +306,8 @@ def __audio_stream(audio_socket: socket.socket, video: Video):
 
     client_socket, addr = audio_socket.accept()
 
-    while True:
-        if client_socket:
-            while True:
-                data = wf.readframes(CHUNK)
-                a = pickle.dumps(data)
-                message = struct.pack("Q", len(a))+a
-                client_socket.sendall(message)
+    for _ in range(0, wf.getnframes()//CHUNK):
+        data = wf.readframes(CHUNK)
+        a = pickle.dumps(data)
+        message = struct.pack("Q", len(a))+a
+        client_socket.sendall(message)

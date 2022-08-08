@@ -9,6 +9,8 @@ import pyaudio
 import pickle
 import struct
 import tqdm
+import keyboard
+
 
 ADDRESS = 'localhost'
 PORT = 2820
@@ -44,8 +46,9 @@ def run() -> None:
             if(not response.startswith("Error")):
                 send_data(int(response.strip()), input("Enter file path: "))
         if command.startswith("watch_video"):
-            video_port, audio_port = map(int, response.split(' '))
-            watch_video(video_port, audio_port)
+            if (not response.startswith("Error")):
+                video_port, audio_port = map(int, response.split(' '))
+                watch_video(video_port, audio_port)
         _ = input("\nPress enter to continue")
 
 
@@ -134,6 +137,7 @@ def logout() -> None:
 
 
 def watch_video(video_port: int, audio_port: int):
+    global BREAK
     BUFF_SIZE = 65536
     BREAK = False
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -143,16 +147,20 @@ def watch_video(video_port: int, audio_port: int):
 
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(audio_stream, ADDRESS, audio_port, BREAK)
+        executor.submit(audio_stream, ADDRESS, audio_port)
         executor.submit(video_stream, client_socket, BUFF_SIZE)
 
 
 def video_stream(client_socket, BUFF_SIZE):
+    global BREAK
     cv2.namedWindow('RECEIVING VIDEO')
     cv2.moveWindow('RECEIVING VIDEO', 10, 360)
+    cv2.startWindowThread()
     fps, st, frames_to_count, cnt = (0, 0, 20, 0)
-    while True:
+    while not BREAK:
         packet, _ = client_socket.recvfrom(BUFF_SIZE)
+        if packet.decode() == "finished":
+            break
         data = base64.b64decode(packet, ' /')
         npdata = np.frombuffer(data, dtype=np.uint8)
 
@@ -162,10 +170,12 @@ def video_stream(client_socket, BUFF_SIZE):
         cv2.imshow("RECEIVING VIDEO", frame)
         key = cv2.waitKey(1) & 0xFF
 
-        if key == ord('q'):
-            client_socket.close()
+        #if key == ord('q'):
+        #    client_socket.close()
             # os._exit(1)
-            break
+        #    break
+
+        
 
         if cnt == frames_to_count:
             try:
@@ -175,13 +185,13 @@ def video_stream(client_socket, BUFF_SIZE):
             except:
                 pass
         cnt += 1
-
+    print("Video Closed!")
     client_socket.close()
     cv2.destroyAllWindows()
 
 
-def audio_stream(host_ip, port, BREAK):
-
+def audio_stream(host_ip, port):
+    global BREAK
     p = pyaudio.PyAudio()
     CHUNK = 1024
     stream = p.open(format=p.get_format_from_width(2),
@@ -193,12 +203,10 @@ def audio_stream(host_ip, port, BREAK):
     # create socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     socket_address = (host_ip, port)
-    print('server listening at', socket_address)
     client_socket.connect(socket_address)
-    print("CLIENT CONNECTED TO", socket_address)
     data = b""
     payload_size = struct.calcsize("Q")
-    while True:
+    while not BREAK:
         try:
             while len(data) < payload_size:
                 packet = client_socket.recv(4*1024)  # 4K
@@ -214,13 +222,10 @@ def audio_stream(host_ip, port, BREAK):
             data = data[msg_size:]
             frame = pickle.loads(frame_data)
             stream.write(frame)
-
         except:
-
             break
-
     client_socket.close()
-    print('Audio closed', BREAK)
+    print('Audio closed!')
 
 
 # use this after connecting to server socket!
@@ -241,7 +246,14 @@ def send_data(port: int, file_path: str):
     s.close()
     print("File Uploaded Successfully!")
 
+def stop_playing():
+    global BREAK
+    BREAK = True
+
 
 if __name__ == '__main__':
+    global BREAK
+    BREAK = False
+    keyboard.add_hotkey('q', lambda: stop_playing())
     init_menus()
     run()
