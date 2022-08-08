@@ -22,7 +22,7 @@ def handle(client: socket.socket, address: tuple) -> None:
     if check_user(proxy_username, proxy_password):
         proxy_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         proxy_client.connect((SERVER, SERVER_PORT))
-        proxy_client.send(" ".join(splitted_command[2:]))
+        proxy_client.send(" ".join(splitted_command[2:]).encode())
         response = proxy_client.recv(1024).decode()
         proxy_client.close()
         client.send(response.encode())

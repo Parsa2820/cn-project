@@ -15,6 +15,7 @@ import sys
 
 ADDRESS = 'localhost'
 PORT = 2820
+PROXY_PORT = 5850
 USERNAME = "_"
 PASSWORD = "_"
 LOGGED_IN = False
@@ -24,8 +25,12 @@ PROMPT = "\nEnter menu item number (or type logout/exit): "
 
 def send_command(command: str) -> str:
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((ADDRESS, PORT))
-    client.send(command.encode())
+    if EN_PROXY:
+        client.connect((PROXY_ADDRESS, PROXY_PORT))
+        client.send(f"{PROXY_USERNAME} {PROXY_PASSWORD} {command}".encode())
+    else:
+        client.connect((ADDRESS, PORT))
+        client.send(command.encode())
     response = client.recv(1024).decode()
     client.close()
     return response
@@ -249,6 +254,18 @@ def stop_playing():
     global BREAK
     BREAK = True
 
+def set_proxy():
+    global EN_PROXY
+    EN_PROXY = input("Use proxy? (y/n): ") == "y"
+    if EN_PROXY:
+        global PROXY_ADDRESS
+        PROXY_ADDRESS = input("Proxy address: ")
+        global PROXY_USERNAME
+        PROXY_USERNAME = input("Proxy username: ")
+        global PROXY_PASSWORD
+        PROXY_PASSWORD = input("Proxy password: ")
+        print("Proxy settings set!")
+    
 
 if __name__ == '__main__':
     global BREAK
@@ -256,5 +273,6 @@ if __name__ == '__main__':
     keyboard.add_hotkey('q', lambda: stop_playing())
     if len(sys.argv) > 1:
         ADDRESS = sys.argv[1]
+    set_proxy()
     init_menus()
     run()
